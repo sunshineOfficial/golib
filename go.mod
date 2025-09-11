@@ -10,6 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/minio/minio-go/v7 v7.0.95
 	github.com/pressly/goose/v3 v3.25.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/redis/go-redis/extra/redisotel/v9 v9.14.0
@@ -39,9 +40,11 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
+	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.22.0 // indirect
@@ -59,6 +62,7 @@ require (
 	github.com/go-openapi/swag/stringutils v0.24.0 // indirect
 	github.com/go-openapi/swag/typeutils v0.24.0 // indirect
 	github.com/go-openapi/swag/yamlutils v0.24.0 // indirect
+	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -66,22 +70,28 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.11 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
+	github.com/minio/crc64nvme v1.0.2 // indirect
+	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/paulmach/orb v0.11.1 // indirect
+	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.14.0 // indirect
+	github.com/rs/xid v1.6.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/swaggo/swag v1.16.6 // indirect
+	github.com/tinylib/msgp v1.3.0 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelsql v0.3.2 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
