@@ -21,6 +21,7 @@ type Client interface {
 	SetVerbose(v bool)
 	Do(request *http.Request) (*http.Response, error)
 	DoJson(ctx goctx.Context, method, url string, in, out any) (int, error)
+	SendFormData(ctx goctx.Context, url string, fields []FormDataField, files []FormDataFile, out any) (int, error)
 }
 
 type HTTPClient struct {
