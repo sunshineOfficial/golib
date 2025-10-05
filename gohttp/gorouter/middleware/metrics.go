@@ -16,7 +16,7 @@ type PrometheusMetric interface {
 type techMetrics struct {
 	totalRequests   *prometheus.CounterVec
 	activeRequests  *prometheus.GaugeVec
-	requestDuration *prometheus.SummaryVec
+	requestDuration *prometheus.HistogramVec
 }
 
 // Metrics включает базовые технические метрики и дает возможность зарегистрировать кастомные метрики.
@@ -46,10 +46,11 @@ func Metrics(metrics ...PrometheusMetric) gorouter.Middleware {
 			},
 			[]string{"path"},
 		),
-		requestDuration: promauto.NewSummaryVec(
-			prometheus.SummaryOpts{
-				Name: "http_request_duration_summary",
-				Help: "Summary of duration of HTTP requests in seconds",
+		requestDuration: promauto.NewHistogramVec(
+			prometheus.HistogramOpts{
+				Name:    "http_request_duration_seconds",
+				Help:    "Histogram of HTTP request durations in seconds",
+				Buckets: []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10, 20, 30, 60},
 			},
 			[]string{"path"},
 		),

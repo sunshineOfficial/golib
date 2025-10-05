@@ -47,6 +47,9 @@ func GetContext(r *http.Request) (Context, error) {
 	if spanCtx.HasTraceID() {
 		ctx.TraceId = spanCtx.TraceID()
 	}
+	if spanCtx.HasSpanID() {
+		ctx.SpanId = spanCtx.SpanID()
+	}
 
 	return ctx, nil
 }

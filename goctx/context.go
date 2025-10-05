@@ -18,6 +18,7 @@ type Context struct {
 	Authorize authorize.Authorize
 	RequestId uuid.UUID
 	TraceId   trace.TraceID
+	SpanId    trace.SpanID
 }
 
 func (c Context) IsAuthorized() bool {
@@ -63,6 +64,7 @@ func (c Context) cloneWith(ctx context.Context) Context {
 		Origin:    c.Origin,
 		RequestId: c.RequestId,
 		TraceId:   c.TraceId,
+		SpanId:    c.SpanId,
 	}
 }
 

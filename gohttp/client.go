@@ -2,6 +2,7 @@ package gohttp
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -93,8 +94,14 @@ func (c HTTPClient) Do(httpRequest *http.Request) (*http.Response, error) {
 	}()
 
 	spanCtx := trace.SpanContextFromContext(httpRequest.Context())
-	if spanCtx.HasTraceID() && c.log != nil {
-		c.log = c.log.WithTraceId(spanCtx.TraceID())
+	if c.log != nil {
+		if spanCtx.HasTraceID() {
+			c.log = c.log.WithTraceId(spanCtx.TraceID())
+		}
+
+		if spanCtx.HasSpanID() {
+			c.log = c.log.WithSpanId(spanCtx.SpanID())
+		}
 	}
 
 	id := fmt.Sprintf("%s %s", httpRequest.Method, httpRequest.URL)
@@ -136,7 +143,8 @@ func (c HTTPClient) DoJson(ctx goctx.Context, method, url string, in, out any) (
 	rs, err := c.Do(rq)
 	if err != nil {
 		if rs != nil && rs.Body != nil {
-			rs.Body.Close()
+			closeErr := rs.Body.Close()
+			err = errors.Join(err, closeErr)
 		}
 
 		return 0, err

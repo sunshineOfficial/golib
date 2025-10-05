@@ -40,7 +40,7 @@ func NewContext(log golog.Logger, rs ResponseWriter, rq *http.Request, options .
 	}
 
 	if holder.traces {
-		log = log.WithTraceId(ctx.TraceId)
+		log = log.WithTraceId(ctx.TraceId).WithSpanId(ctx.SpanId)
 	}
 
 	return Context{

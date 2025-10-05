@@ -19,6 +19,9 @@ type Logger interface {
 	// WithTraceId Возвращает Logger с сохраненным полем traceId.
 	WithTraceId(traceId trace.TraceID) Logger
 
+	// WithSpanId Возвращает Logger с сохраненным полем spanId.
+	WithSpanId(spanId trace.SpanID) Logger
+
 	// WithBookId Возвращает Logger с сохраненным полем bookId.
 	WithBookId(bookId string) Logger
 
@@ -155,6 +158,18 @@ func (s SwLogger) WithTraceId(traceId trace.TraceID) Logger {
 	}
 
 	field := zap.String("traceId", traceId.String())
+	s.log = s.log.With(field)
+	s.nowLog = s.nowLog.With(field)
+
+	return s
+}
+
+func (s SwLogger) WithSpanId(spanId trace.SpanID) Logger {
+	if !spanId.IsValid() {
+		return s
+	}
+
+	field := zap.String("spanId", spanId.String())
 	s.log = s.log.With(field)
 	s.nowLog = s.nowLog.With(field)
 

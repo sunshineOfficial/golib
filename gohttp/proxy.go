@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand/v2"
 	"net/http"
 	"net/url"
 	"time"
@@ -120,7 +121,10 @@ func (t *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 }
 
 func backoff(retries int) time.Duration {
-	return time.Duration(math.Pow(2, float64(retries))) * time.Second
+	exp := math.Pow(2, float64(retries))
+	jitter := 0.5 + rand.Float64() // [0.5, 1.5)
+
+	return time.Duration(exp*jitter) * time.Second
 }
 
 func shouldRetry(err error, resp *http.Response) bool {
