@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/sunshineOfficial/golib/goctx"
@@ -61,6 +64,57 @@ func ReadRequestXml(r *http.Request, a any) error {
 
 	defer r.Body.Close()
 	return xml.NewDecoder(r.Body).Decode(a)
+}
+
+func WriteRequestMultipart(r *http.Request, data *MultipartData) (err error) {
+	if data == nil {
+		return nil
+	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	for _, field := range data.Fields {
+		if err = writer.WriteField(field.Name, field.Value); err != nil {
+			err = fmt.Errorf("write field: %w", err)
+			return closeWriter(writer, err)
+		}
+	}
+
+	for _, file := range data.Files {
+		part, createErr := writer.CreateFormFile(file.FieldName, file.FileName)
+		if createErr != nil {
+			err = fmt.Errorf("create form file: %w", createErr)
+			return closeWriter(writer, err)
+		}
+
+		_, err = io.Copy(part, file.Reader)
+		if err != nil {
+			err = fmt.Errorf("copy form file: %w", err)
+			return closeWriter(writer, err)
+		}
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return fmt.Errorf("close writer: %w", err)
+	}
+
+	r.Header.Set("Content-Type", writer.FormDataContentType())
+	r.Body = io.NopCloser(body)
+	r.ContentLength = int64(body.Len())
+
+	return err
+}
+
+func closeWriter(writer *multipart.Writer, err error) error {
+	closeErr := writer.Close()
+	if closeErr != nil {
+		closeErr = fmt.Errorf("close writer: %w", closeErr)
+		return errors.Join(err, closeErr)
+	}
+
+	return err
 }
 
 func newReadCloser(e func(b io.Writer, a any) error, a any) (io.ReadCloser, error) {

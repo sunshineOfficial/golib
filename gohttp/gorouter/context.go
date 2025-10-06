@@ -3,6 +3,7 @@ package gorouter
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -15,7 +16,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-const _defaultMultipartFormSize = 20 * 1024 * 1024
+const _defaultMultipartFormSize = 32 * 1024 * 1024
 
 type Context struct {
 	response ResponseWriter
@@ -99,6 +100,36 @@ func (c Context) FormData() (*multipart.Form, error) {
 	}
 
 	return c.request.MultipartForm, nil
+}
+
+func (c Context) FormFiles(key string) ([]*multipart.FileHeader, error) {
+	if c.request.MultipartForm == nil {
+		err := c.request.ParseMultipartForm(_defaultMultipartFormSize)
+		if err != nil {
+			return nil, fmt.Errorf("parse multipart form: %w", err)
+		}
+	}
+
+	if c.request.MultipartForm == nil || c.request.MultipartForm.File == nil {
+		return nil, errors.New("missing multipart form")
+	}
+
+	return c.request.MultipartForm.File[key], nil
+}
+
+func (c Context) FormValues(key string) ([]string, error) {
+	if c.request.MultipartForm == nil {
+		err := c.request.ParseMultipartForm(_defaultMultipartFormSize)
+		if err != nil {
+			return nil, fmt.Errorf("parse multipart form: %w", err)
+		}
+	}
+
+	if c.request.MultipartForm == nil || c.request.MultipartForm.Value == nil {
+		return nil, errors.New("missing multipart form")
+	}
+
+	return c.request.MultipartForm.Value[key], nil
 }
 
 func (c Context) ReadJson(a any) error {

@@ -1,12 +1,9 @@
 package gohttp
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -22,7 +19,6 @@ type Client interface {
 	SetVerbose(v bool)
 	Do(request *http.Request) (*http.Response, error)
 	DoJson(ctx goctx.Context, method, url string, in, out any) (int, error)
-	SendFormData(ctx goctx.Context, url string, fields []FormDataField, files []FormDataFile, out any) (int, error)
 }
 
 type HTTPClient struct {
@@ -173,52 +169,4 @@ func (c HTTPClient) logVerbose(tag golog.Tag, format string, params ...interface
 	}
 
 	c.log.DebugEntryf(format, params...).WithTags(tags...).Write()
-}
-
-func (c HTTPClient) SendFormData(ctx goctx.Context, url string, fields []FormDataField, files []FormDataFile, out any) (int, error) {
-	var (
-		body   = &bytes.Buffer{}
-		writer = multipart.NewWriter(body)
-	)
-
-	for _, field := range fields {
-		err := writer.WriteField(field.Name, field.Value)
-		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("can't write files: %w", err)
-		}
-	}
-
-	for _, file := range files {
-		part, err := writer.CreatePart(file.MIMEHeader)
-		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("can't create part: %w", err)
-		}
-
-		_, err = io.Copy(part, file.Payload)
-		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("can't copy file: %w", err)
-		}
-	}
-
-	if err := writer.Close(); err != nil {
-		return http.StatusBadRequest, fmt.Errorf("can't close multipart-writer: %w", err)
-	}
-
-	req, err := NewRequest(ctx, http.MethodPost, url, body)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("can't create request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-
-	rs, err := c.httpClient.Do(req)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("can't create request: %w; rs status code: %d", err, rs.StatusCode)
-	}
-
-	if err = ReadResponseJson(rs, out); err != nil {
-		return rs.StatusCode, fmt.Errorf("can't read response: %w", err)
-	}
-
-	return rs.StatusCode, nil
 }

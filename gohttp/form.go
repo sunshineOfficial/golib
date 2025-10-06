@@ -1,16 +1,24 @@
 package gohttp
 
 import (
-	"mime/multipart"
-	"net/textproto"
+	"io"
 )
 
-type FormDataField struct {
+// MultipartField представляет поле формы
+type MultipartField struct {
 	Name  string
 	Value string
 }
 
-type FormDataFile struct {
-	Payload    multipart.File
-	MIMEHeader textproto.MIMEHeader
+// MultipartFile представляет файл для загрузки
+type MultipartFile struct {
+	FieldName string
+	FileName  string
+	Reader    io.Reader // Содержимое файла
+}
+
+// MultipartData содержит данные для multipart формы
+type MultipartData struct {
+	Fields []MultipartField
+	Files  []MultipartFile
 }
