@@ -64,15 +64,15 @@ func Global() Logger {
 	return _global
 }
 
-// SwLogger реализация Logger основанная на zap.Logger
-type SwLogger struct {
+// GoLogger реализация Logger основанная на zap.Logger
+type GoLogger struct {
 	log    *zap.Logger
 	nowLog *zap.Logger
 	tags   []Tag
 }
 
 // NewLogger возвращает новый экземпляр логгера
-func NewLogger(appName string, options ...Option) SwLogger {
+func NewLogger(appName string, options ...Option) GoLogger {
 	jsonConfig := zapcore.EncoderConfig{
 		EncodeLevel:   zapcore.CapitalLevelEncoder,
 		EncodeTime:    zapcore.RFC3339TimeEncoder,
@@ -119,7 +119,7 @@ func NewLogger(appName string, options ...Option) SwLogger {
 		zap.String("containerId", containerId),
 	)
 
-	logger := SwLogger{
+	logger := GoLogger{
 		log:    log.WithOptions(zap.AddCallerSkip(1)),
 		nowLog: log,
 		tags:   optionsHolder.tags,
@@ -132,13 +132,13 @@ func NewLogger(appName string, options ...Option) SwLogger {
 	return logger
 }
 
-func (s SwLogger) WithSkip(n int) Logger {
+func (s GoLogger) WithSkip(n int) Logger {
 	s.nowLog = s.nowLog.WithOptions(zap.AddCallerSkip(n))
 	s.log = s.nowLog.WithOptions(zap.AddCallerSkip(1))
 	return s
 }
 
-func (s SwLogger) WithUserInfo(userId int) Logger {
+func (s GoLogger) WithUserInfo(userId int) Logger {
 	if userId < 0 {
 		return s
 	}
@@ -152,7 +152,7 @@ func (s SwLogger) WithUserInfo(userId int) Logger {
 	return s
 }
 
-func (s SwLogger) WithTraceId(traceId trace.TraceID) Logger {
+func (s GoLogger) WithTraceId(traceId trace.TraceID) Logger {
 	if !traceId.IsValid() {
 		return s
 	}
@@ -164,7 +164,7 @@ func (s SwLogger) WithTraceId(traceId trace.TraceID) Logger {
 	return s
 }
 
-func (s SwLogger) WithSpanId(spanId trace.SpanID) Logger {
+func (s GoLogger) WithSpanId(spanId trace.SpanID) Logger {
 	if !spanId.IsValid() {
 		return s
 	}
@@ -176,7 +176,7 @@ func (s SwLogger) WithSpanId(spanId trace.SpanID) Logger {
 	return s
 }
 
-func (s SwLogger) WithBookId(bookId string) Logger {
+func (s GoLogger) WithBookId(bookId string) Logger {
 	field := zap.String("bookId", bookId)
 	s.log = s.log.With(field)
 	s.nowLog = s.nowLog.With(field)
@@ -184,12 +184,12 @@ func (s SwLogger) WithBookId(bookId string) Logger {
 	return s
 }
 
-func (s SwLogger) WithTags(tags ...Tag) Logger {
+func (s GoLogger) WithTags(tags ...Tag) Logger {
 	s.tags = append(s.tags, tags...)
 	return s
 }
 
-func (s SwLogger) Message(level MessageLevel, message string) LogEntry {
+func (s GoLogger) Message(level MessageLevel, message string) LogEntry {
 	return Entry{
 		level:     level,
 		message:   message,
@@ -197,7 +197,7 @@ func (s SwLogger) Message(level MessageLevel, message string) LogEntry {
 	}
 }
 
-func (s SwLogger) DebugEntry(message string) LogEntry {
+func (s GoLogger) DebugEntry(message string) LogEntry {
 	return Entry{
 		level:     LevelDebug,
 		message:   message,
@@ -206,19 +206,19 @@ func (s SwLogger) DebugEntry(message string) LogEntry {
 	}
 }
 
-func (s SwLogger) DebugEntryf(format string, args ...interface{}) LogEntry {
+func (s GoLogger) DebugEntryf(format string, args ...interface{}) LogEntry {
 	return s.DebugEntry(fmt.Sprintf(format, args...))
 }
 
-func (s SwLogger) Debug(message string) {
+func (s GoLogger) Debug(message string) {
 	s.nowLog.Debug(message, marshalTags(s.tags))
 }
 
-func (s SwLogger) Debugf(format string, args ...interface{}) {
+func (s GoLogger) Debugf(format string, args ...interface{}) {
 	s.nowLog.Debug(fmt.Sprintf(format, args...), marshalTags(s.tags))
 }
 
-func (s SwLogger) ErrorEntry(message string) LogEntry {
+func (s GoLogger) ErrorEntry(message string) LogEntry {
 	return Entry{
 		level:     LevelError,
 		message:   message,
@@ -227,19 +227,19 @@ func (s SwLogger) ErrorEntry(message string) LogEntry {
 	}
 }
 
-func (s SwLogger) ErrorEntryf(format string, args ...interface{}) LogEntry {
+func (s GoLogger) ErrorEntryf(format string, args ...interface{}) LogEntry {
 	return s.ErrorEntry(fmt.Sprintf(format, args...))
 }
 
-func (s SwLogger) Error(message string) {
+func (s GoLogger) Error(message string) {
 	s.nowLog.Error(message, marshalTags(s.tags))
 }
 
-func (s SwLogger) Errorf(format string, args ...interface{}) {
+func (s GoLogger) Errorf(format string, args ...interface{}) {
 	s.nowLog.Error(fmt.Sprintf(format, args...), marshalTags(s.tags))
 }
 
-func (s SwLogger) writeEntry(entry Entry) {
+func (s GoLogger) writeEntry(entry Entry) {
 	switch entry.level {
 	case LevelDebug:
 		s.log.Debug(entry.message, marshalTags(entry.tags))
