@@ -9,6 +9,10 @@ var (
 	Moscow, _ = time.LoadLocation("Europe/Moscow")
 )
 
+func MoscowNow() time.Time {
+	return time.Now().In(Moscow)
+}
+
 func AtLocation(t time.Time, location *time.Location) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), 0, location)
 }
