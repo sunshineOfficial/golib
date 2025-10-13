@@ -87,7 +87,9 @@ func WriteRequestMultipart(r *http.Request, data *MultipartData) (err error) {
 	for _, file := range data.Files {
 		headers := make(textproto.MIMEHeader)
 		headers.Set("Content-Disposition", multipart.FileContentDisposition(file.FieldName, file.FileName))
-		headers.Set("Content-Type", getContentTypeByExtension(file.FileName))
+		ct := getContentTypeByExtension(file.FileName)
+		fmt.Println(ct)
+		headers.Set("Content-Type", ct)
 
 		part, createErr := writer.CreatePart(headers)
 		if createErr != nil {
