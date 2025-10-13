@@ -87,7 +87,7 @@ func WriteRequestMultipart(r *http.Request, data *MultipartData) (err error) {
 	for _, file := range data.Files {
 		headers := make(textproto.MIMEHeader)
 		headers.Set("Content-Disposition", multipart.FileContentDisposition(file.FieldName, file.FileName))
-		headers.Set("Content-Type", getContentTypeByExtension(file.FileName))
+		headers.Set("Content-Type", ContentTypeByExtension(file.FileName))
 
 		part, createErr := writer.CreatePart(headers)
 		if createErr != nil {
@@ -114,7 +114,7 @@ func WriteRequestMultipart(r *http.Request, data *MultipartData) (err error) {
 	return err
 }
 
-func getContentTypeByExtension(filename string) string {
+func ContentTypeByExtension(filename string) string {
 	ext := filepath.Ext(filename)
 	if ext == "" {
 		return "application/octet-stream"
