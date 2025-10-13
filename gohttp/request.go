@@ -7,8 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
+	"path/filepath"
 
 	"github.com/sunshineOfficial/golib/goctx"
 )
@@ -82,7 +85,11 @@ func WriteRequestMultipart(r *http.Request, data *MultipartData) (err error) {
 	}
 
 	for _, file := range data.Files {
-		part, createErr := writer.CreateFormFile(file.FieldName, file.FileName)
+		headers := make(textproto.MIMEHeader)
+		headers.Set("Content-Disposition", multipart.FileContentDisposition(file.FieldName, file.FileName))
+		headers.Set("Content-Type", getContentTypeByExtension(file.FileName))
+
+		part, createErr := writer.CreatePart(headers)
 		if createErr != nil {
 			err = fmt.Errorf("create form file: %w", createErr)
 			return closeWriter(writer, err)
@@ -105,6 +112,19 @@ func WriteRequestMultipart(r *http.Request, data *MultipartData) (err error) {
 	r.ContentLength = int64(body.Len())
 
 	return err
+}
+
+func getContentTypeByExtension(filename string) string {
+	ext := filepath.Ext(filename)
+	if ext == "" {
+		return "application/octet-stream"
+	}
+
+	contentType := mime.TypeByExtension(ext)
+	if contentType == "" {
+		return "application/octet-stream"
+	}
+	return contentType
 }
 
 func closeWriter(writer *multipart.Writer, err error) error {
