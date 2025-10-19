@@ -35,11 +35,21 @@ func (s gooseLogger) Println(v ...interface{}) {
 }
 
 // Migrate применяет доступные миграции из файлов по пути path в указанной fs
-func Migrate(fs fs.FS, log golog.Logger, db *sqlx.DB, path string) error {
+func Migrate(fs fs.FS, log golog.Logger, db *sqlx.DB, path, dialect string) error {
 	goose.SetVerbose(false)
 	goose.SetLogger(gooseLogger{log: log})
 	goose.SetBaseFS(fs)
 	goose.SetTableName("db_version")
 
-	return goose.Up(db.DB, path)
+	err := goose.SetDialect(dialect)
+	if err != nil {
+		return fmt.Errorf("set dialect: %w", err)
+	}
+
+	err = goose.Up(db.DB, path)
+	if err != nil {
+		return fmt.Errorf("up: %w", err)
+	}
+
+	return nil
 }
