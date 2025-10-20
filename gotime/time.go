@@ -1,6 +1,7 @@
 package gotime
 
 import (
+	"database/sql/driver"
 	"encoding/xml"
 	"fmt"
 	"strings"
@@ -137,4 +138,26 @@ func (t Time) format() string {
 	}
 
 	return t.Time.Format(layout)
+}
+
+func (t *Time) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
+
+	switch v := src.(type) {
+	case time.Time:
+		t.Time = v
+		return nil
+	case []byte:
+		return t.parseCleanString(string(v))
+	case string:
+		return t.parseCleanString(v)
+	default:
+		return fmt.Errorf("cannot scan type %T", src)
+	}
+}
+
+func (t Time) Value() (driver.Value, error) {
+	return t.Time, nil
 }
