@@ -99,5 +99,6 @@ func (c *ConsumerImpl) Subscribe(s Subscriber) {
 }
 
 func (c *ConsumerImpl) Close(ctx context.Context) error {
+	c.listener.stop()
 	return gosync.WaitContext(ctx, c.reader.Close)
 }
